@@ -3,6 +3,8 @@ var path = require('path');
 var bodyParser = require('body-parser');
 const cors = require("cors");
 
+var smsAndEmail = require('./controllers/sendmailandsms.controller');
+
 // var masterRouter = require('./routes/master.routes');
 var rfidTagMasterRouter = require('./routes/rfidtagmaster.routes');
 var transactionRouter = require('./routes/transactiontable.routes');
@@ -41,6 +43,10 @@ db.sequelize.sync();
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to BRiOT application." });
 });
+
+// setInterval(async function(){
+//     smsAndEmail.checkDeviceStatus();
+//   },60000);
 
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development

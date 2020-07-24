@@ -7,10 +7,11 @@ const WhereBuilder = require('../helpers/WhereBuilder');
 //create device transaction on device transaction
 exports.create = async(req,res,next) =>{
 
-  var {deviceId , connectionStatus} = req.body;
+  var {deviceId , connectionStatus , station} = req.body;
   
   var transaction = {
   	deviceId : deviceId,
+    station : station,
     connectionStatus : connectionStatus,
     timestamp : Date.now()
   }
@@ -21,7 +22,7 @@ exports.create = async(req,res,next) =>{
 
 // Retrieve all device transaction entry data from the database.
 exports.findAll = async (req, res,next) => {
-  var {deviceId , timestamp , connectionStatus , offset , limit} = req.query;
+  var {deviceId , timestamp , station , connectionStatus , offset , limit} = req.query;
   var newOffset = 0;
   var newLimit = 100;
 
@@ -36,6 +37,7 @@ exports.findAll = async (req, res,next) => {
   var whereClause = new WhereBuilder()
   .clause('connectionStatus', connectionStatus)
   .clause('deviceId', deviceId)
+  .clause('station', station)
   .clause('timestamp', timestamp).toJSON();
   
   var transactionData = await DeviceTransactionTable.findAll({ 

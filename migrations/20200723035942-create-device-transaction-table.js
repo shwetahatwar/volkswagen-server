@@ -12,6 +12,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      station: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       connectionStatus: {
         type: Sequelize.STRING,
         allowNull: false

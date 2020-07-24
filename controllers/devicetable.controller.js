@@ -3,11 +3,12 @@ const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 var HTTPError = require('http-errors');
 const WhereBuilder = require('../helpers/WhereBuilder');
+const deviceTransactionFunction = require('../functions/createDeviceTransaction');
 
 //create Device table
 exports.create = async(req,res,next) =>{
 
-  var {deviceId , deviceIp , connectionStatus } = req.body;
+  var {deviceId , deviceIp , connectionStatus , station } = req.body;
   if (!deviceId || !deviceIp || !connectionStatus ) {
     return next(HTTPError(400, "Content cannot be empty!"))
   }
@@ -15,6 +16,7 @@ exports.create = async(req,res,next) =>{
   var device = {
   	deviceId: deviceId,
     deviceIp: deviceIp,
+    station: station,
     connectionStatus: connectionStatus,
     timestamp: Date.now()
   }
@@ -46,7 +48,7 @@ exports.sendCreateResponse = async (req, res, next) => {
 
 // Retrieve device from the database.
 exports.findAll = async (req, res,next) => {
-  var { deviceId , deviceIp , connectionStatus , offset , limit} = req.query;
+  var { deviceId , deviceIp , station , connectionStatus , offset , limit} = req.query;
   var newOffset = 0;
   var newLimit = 100;
 
@@ -61,6 +63,7 @@ exports.findAll = async (req, res,next) => {
   var whereClause = new WhereBuilder()
   .clause('deviceId', deviceId)
   .clause('deviceIp', deviceIp)
+  .clause('station', station)
   .clause('connectionStatus', connectionStatus).toJSON();
   
   var deviceData = await DeviceTable.findAll({ 
@@ -105,6 +108,7 @@ exports.update = async (req, res,next) => {
   whereClause = new WhereBuilder()
   .clause('deviceId', deviceId)
   .clause('deviceIp', deviceIp)
+  .clause('station', station)
   .clause('connectionStatus', connectionStatus).toJSON();
 
   try{
@@ -129,4 +133,5 @@ exports.update = async (req, res,next) => {
   req.updatedDeviceData = updatedDeviceData;
   next();    
 };
+
 

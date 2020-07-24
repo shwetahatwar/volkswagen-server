@@ -13,6 +13,11 @@ module.exports = {
         allowNull: false,
         unique: true
       },
+      station: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+      },
       deviceIp: {
         type: Sequelize.STRING,
         allowNull: false,

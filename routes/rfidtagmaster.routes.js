@@ -22,4 +22,7 @@ router.get("/get/searchdata",
 	shiftTables.findByName,
     rfidTagMasters.searchMasterDataByQuery);
 
+router.get("/get/count/mastercount",
+    rfidTagMasters.countOfRfidMaster);
+
 module.exports = router;

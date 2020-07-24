@@ -92,7 +92,7 @@ exports.update = async (req, res,next) => {
 
 // Retrieve all rfid tag master data from the database.
 exports.findAll = async (req, res,next) => {
-  var {epcId , pinNumber , vinNumber , isActive , offset , limit} = req.query;
+  var {epcId , pinNumber , vinNumber ,entryStation , verifiedStation , isActive , offset , limit} = req.query;
   var newOffset = 0;
   var newLimit = 100;
 
@@ -108,6 +108,8 @@ exports.findAll = async (req, res,next) => {
   .clause('epcId', epcId)
   .clause('pinNumber', pinNumber)
   .clause('isActive', isActive)
+  .clause('entryStation', entryStation)
+  .clause('verifiedStation', verifiedStation)
   .clause('vinNumber', vinNumber).toJSON();
 
   var masterData;
@@ -223,6 +225,8 @@ exports.searchMasterDataByQuery = async (req, res,next) => {
     };
   }
 
+  whereClause.isActive = true;
+
   var reportData = await RFIDTagMaster.findAll({ 
     where: whereClause,
     order: [
@@ -253,3 +257,22 @@ exports.searchMasterDataByQuery = async (req, res,next) => {
 
   res.status(200).send(responseData);
 };
+
+
+// get count of all rfid master data 
+exports.countOfRfidMaster = async (req, res) => {
+ var whereClause={};
+ whereClause.isActive=true;
+  var total = await RFIDTagMaster.count({
+    where :whereClause
+  })
+
+  if(!total){
+    return next(HTTPError(500, "Internal error has occurred, while getting count of RFID tag master"))
+  }
+
+  var totalCount = {
+    totalCount : total 
+  }
+  res.status(200).send(totalCount);
+}
