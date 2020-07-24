@@ -44,6 +44,7 @@ async function sendEmail(device){
 //     console.log(err);
 //   }
 // });
+
   var transporter = nodemailer.createTransport(selfSignedConfig);
   var result ="Hi Sir, <br/><br/>";
   result = result + "Writing just to let you know that below device is disconnected at station "+device["station"]+".";
