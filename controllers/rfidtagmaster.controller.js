@@ -50,14 +50,13 @@ exports.update = async (req, res,next) => {
   const id = req.params.id;
   var { epcId , vinNumber , pinNumber,isActive } = req.body;
   
-  whereClause = new WhereBuilder()
+  updateData = new WhereBuilder()
   .clause('epcId', epcId)
   .clause('vinNumber', vinNumber)
   .clause('isActive', isActive)  
   .clause('pinNumber', pinNumber).toJSON();
-  console.log("whereClause",whereClause)
   try{
-    var updatedMasterData = await RFIDTagMaster.update(whereClause, {
+    var updatedMasterData = await RFIDTagMaster.update(updateData, {
       where: {
         id: id
       }

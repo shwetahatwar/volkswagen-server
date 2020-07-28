@@ -121,13 +121,13 @@ exports.update = async (req, res,next) => {
   const id = req.params.id;
   var { name , startTime , endTime } = req.body;
   
-  whereClause = new WhereBuilder()
+  updateData = new WhereBuilder()
   .clause('name', name)
   .clause('startTime', startTime)
   .clause('endTime', endTime).toJSON();
 
   try{
-    var updatedShiftData = await ShiftTable.update(whereClause, {
+    var updatedShiftData = await ShiftTable.update(updateData, {
       where: {
         id: id
       }

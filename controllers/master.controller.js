@@ -1,3 +1,5 @@
+//NOT IN USE
+
 const db = require("../models");
 const Master = db.masters;
 const Op = db.Sequelize.Op;

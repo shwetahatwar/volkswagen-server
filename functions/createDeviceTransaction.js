@@ -5,19 +5,19 @@ const DeviceTransactionTable = require('../models').deviceTransactionTable;
 const DeviceTable = require('../models').deviceTable;
 
 exports.updateDeviceAndCreateTransaction = async(status,deviceId,station)=> {
-	var whereClause = {};
-	whereClause.connectionStatus = status;
-	whereClause.deviceId = deviceId;
-	whereClause.station = station;
-	whereClause.timestamp = Date.now();
+	var updateData = {};
+	updateData.connectionStatus = status;
+	updateData.deviceId = deviceId;
+	updateData.station = station;
+	updateData.timestamp = Date.now();
 
-	var updatedDeviceData = await DeviceTable.update(whereClause, {
+	var updatedDeviceData = await DeviceTable.update(updateData, {
 		where: {
 			deviceId: deviceId
 		}
 	});
 
-	var transactionData = await DeviceTransactionTable.create(whereClause);
+	var transactionData = await DeviceTransactionTable.create(updateData);
 	return transactionData;
 	
 };

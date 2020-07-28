@@ -5,14 +5,14 @@ var HTTPError = require('http-errors');
 const TransactionTable = require('../models').transactionTable;
 
 exports.updateRFIDMMasterAndCreateTransaction = async(rfidData)=> {
-	var whereClause = {};
+	var updateData = {};
 	console.log("rfidData",rfidData)
 	var rfidMasterId = rfidData["id"];
-	whereClause.verifiedTimestamp = Date.now();
-	whereClause.verifiedStation = "CP8";
+	updateData.verifiedTimestamp = Date.now();
+	updateData.verifiedStation = "CP8";
 
 	try{
-		var updatedMasterData = await RFIDTagMaster.update(whereClause, {
+		var updatedMasterData = await RFIDTagMaster.update(updateData, {
 			where: {
 				id: rfidMasterId
 			}

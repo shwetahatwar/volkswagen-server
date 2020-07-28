@@ -103,16 +103,16 @@ exports.sendFindResponse = async (req, res, next) => {
 //Update device data
 exports.update = async (req, res,next) => {
   const id = req.params.id;
-  var { deviceId , deviceIp , connectionStatus } = req.body;
+  var { deviceId , deviceIp , station , connectionStatus } = req.body;
   
-  whereClause = new WhereBuilder()
+  updateData = new WhereBuilder()
   .clause('deviceId', deviceId)
   .clause('deviceIp', deviceIp)
   .clause('station', station)
   .clause('connectionStatus', connectionStatus).toJSON();
 
   try{
-    var updatedDeviceData = await DeviceTable.update(whereClause, {
+    var updatedDeviceData = await DeviceTable.update(updateData, {
       where: {
         id: id
       }

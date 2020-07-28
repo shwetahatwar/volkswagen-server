@@ -103,14 +103,14 @@ exports.update = async (req, res,next) => {
   const id = req.params.id;
   var { name , emailId , mobileNumber , isActive } = req.body;
   
-  whereClause = new WhereBuilder()
+  updateData = new WhereBuilder()
   .clause('name', name)
   .clause('emailId', emailId)
   .clause('isActive', isActive)
   .clause('mobileNumber', mobileNumber).toJSON();
 
   try{
-    var updatedUserDetail = await UserDetails.update(whereClause, {
+    var updatedUserDetail = await UserDetails.update(updateData, {
       where: {
         id: id
       }
