@@ -117,6 +117,7 @@ exports.update = async (req, res,next) => {
         id: id
       }
     })
+    
     if (!updatedDeviceData) {
       return next(HTTPError(500, "Device not updated"))
     }
