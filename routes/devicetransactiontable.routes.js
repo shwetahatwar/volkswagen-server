@@ -13,4 +13,7 @@ router.get("/:id",
 	deviceTransactionTables.findOne,
 	deviceTransactionTables.sendFindResponse);
 
+router.get("/get/getdevicestatus", 
+	deviceTransactionTables.getDeviceStatus);
+
 module.exports = router;

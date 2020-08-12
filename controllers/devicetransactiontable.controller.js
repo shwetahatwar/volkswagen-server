@@ -78,3 +78,26 @@ exports.sendCreateResponse = async (req, res, next) => {
 exports.sendFindResponse = async (req, res, next) => {
   res.status(200).send(req.transactionDataList);
 };
+
+exports.getDeviceStatus = async (req, res, next) => {
+  var dt = new Date();
+  dt.setMinutes( dt.getMinutes() - 30 );
+  var timestamp = new Date(dt).getTime();
+  console.log(timestamp);
+  var whereClause = {};
+  whereClause.createdAt ={
+    [Op.gte]: timestamp,
+  }
+  var transactionData = await DeviceTransactionTable.findAll({
+    where:whereClause,
+    attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('deviceId')), 'deviceId'],'connectionStatus'],
+  });
+
+  if (!transactionData) {
+    return next(HTTPError(500, "Device transaction table data not found"))
+  }
+
+  res.status(200).send(transactionData);
+
+};
+

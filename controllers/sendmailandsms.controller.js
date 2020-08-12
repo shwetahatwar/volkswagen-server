@@ -3,7 +3,7 @@ var HTTPError = require('http-errors');
 var ping = require('ping');
 const deviceTransactionFunction = require('../functions/createDeviceTransaction');
 var nodemailer = require ('nodemailer');
-var text = require('textbelt');
+// var text = require('textbelt');
 
 var selfSignedConfig = {
   host: 'smtp.zoho.com',
@@ -14,7 +14,7 @@ var selfSignedConfig = {
     pass: "UQvm0upjLKBy"
   }
 };
-          
+
 module.exports = {
   async checkDeviceStatus(){
     console.log("Inside device status check")
@@ -26,10 +26,11 @@ module.exports = {
       if(!data["alive"]){
         status = "Disconnected";
       //send mail code
+    }
+    var createTransactionData = await deviceTransactionFunction.updateDeviceAndCreateTransaction(status,hosts[i]["deviceId"],hosts[i]["station"])
+    if(status == "Disconnected"){
       var mail = sendEmail(hosts[i]);
     }
-
-    var createTransactionData = await deviceTransactionFunction.updateDeviceAndCreateTransaction(status,hosts[i]["deviceId"],hosts[i]["station"])
   }
 },
 
@@ -45,40 +46,40 @@ async function sendEmail(device){
 //   }
 // });
 
-  var transporter = nodemailer.createTransport(selfSignedConfig);
-  var result ="Hi Sir, <br/><br/>";
-  result = result + "Writing just to let you know that below device is disconnected at station "+device["station"]+".";
-  result += "<br/>";
-  result += "<br/>";
-  result += "<table border=1>";
-  result += "<th>Device Id</td>";
-  result += "<th>Device IP</td>";
-  result += "<th>Station</td>";
-  result += "<th>Connection Status</td>";        
-  result += "<tr>";
-  result += "<td><b>"+device["deviceId"]+"</b></td>";
-  result += "<td><b>"+device["deviceIp"]+"</b></td>";
-  result += "<td><b>"+device["station"]+"</b></td>";
-  result += "<td><b>"+device["connectionStatus"]+"</b></td>";
-  result += "</tr>";
-  result += "</table>";
-  result += "<br/>";
-  result +="Have a great day!";
-  console.log("result",result);
-  var mailOptions = {
-    from: "servicedesk@briot.in", 
-    to: "sagar@briot.in;servicedesk@briot.in",
-    subject: "Device Connection Alert", 
-    html: ''+result+'',
-  };
-  transporter.sendMail(mailOptions, function(error, info) {
-    if(error){
-      return error;
-      console.log(error);
-    } else {
-      console.log('Message sent: ' + info.response);
-      return "mail sent";
-    }
-  });
+var transporter = nodemailer.createTransport(selfSignedConfig);
+var result ="Hi Sir, <br/><br/>";
+result = result + "Writing just to let you know that below device is disconnected at station "+device["station"]+".";
+result += "<br/>";
+result += "<br/>";
+result += "<table border=1>";
+result += "<th>Device Id</td>";
+result += "<th>Device IP</td>";
+result += "<th>Station</td>";
+result += "<th>Connection Status</td>";        
+result += "<tr>";
+result += "<td><b>"+device["deviceId"]+"</b></td>";
+result += "<td><b>"+device["deviceIp"]+"</b></td>";
+result += "<td><b>"+device["station"]+"</b></td>";
+result += "<td><b>"+device["connectionStatus"]+"</b></td>";
+result += "</tr>";
+result += "</table>";
+result += "<br/>";
+result +="Have a great day!";
+console.log("result",result);
+var mailOptions = {
+  from: "servicedesk@briot.in", 
+  to: "sagar@briot.in;servicedesk@briot.in",
+  subject: "Device Connection Alert", 
+  html: ''+result+'',
+};
+transporter.sendMail(mailOptions, function(error, info) {
+  if(error){
+    return error;
+    console.log(error);
+  } else {
+    console.log('Message sent: ' + info.response);
+    return "mail sent";
+  }
+});
 
 }

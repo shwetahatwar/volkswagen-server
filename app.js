@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 
 // setInterval(async function(){
 //     smsAndEmail.checkDeviceStatus();
-//   },60000);
+//   },600000);
 
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
