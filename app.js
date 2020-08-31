@@ -59,7 +59,8 @@ app.use(function(err, req, res, next) {
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, process.env.OPENSHIFT_NODEJS_IP || process.env.IP || '192.168.0.7', () => {
+  console.log(process.env.OPENSHIFT_NODEJS_IP);
   console.log(`Server is running on port ${PORT}.`);
 });
-
+// 80, process.env.OPENSHIFT_NODEJS_IP || process.env.IP || '127.0.0.1'

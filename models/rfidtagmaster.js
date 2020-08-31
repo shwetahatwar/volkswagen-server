@@ -1,9 +1,17 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const rfidTagMaster = sequelize.define('rfidTagMaster', {
-    vinNumber: DataTypes.STRING,
+    vinNumber: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    epcId: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
     pinNumber: DataTypes.STRING,
-    epcId: DataTypes.STRING,
     entryTimestamp: DataTypes.STRING,
     verifiedTimestamp: DataTypes.STRING,
     entryStation: DataTypes.STRING,
