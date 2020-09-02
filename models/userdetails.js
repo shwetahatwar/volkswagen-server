@@ -2,8 +2,21 @@
 module.exports = (sequelize, DataTypes) => {
   const userDetails = sequelize.define('userDetails', {
     name: DataTypes.STRING,
-    emailId: DataTypes.STRING,
-    mobileNumber: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    emailId: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    mobileNumber: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
     isActive: DataTypes.BOOLEAN
   }, {});
   userDetails.associate = function(models) {

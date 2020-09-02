@@ -1,8 +1,16 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const deviceTable = sequelize.define('deviceTable', {
-    deviceId: DataTypes.STRING,
-    deviceIp: DataTypes.STRING,
+   deviceId: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
+    deviceIp: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
     station: DataTypes.STRING,
     connectionStatus: DataTypes.STRING,
     timestamp: DataTypes.STRING

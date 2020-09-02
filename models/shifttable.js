@@ -1,7 +1,11 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const shiftTable = sequelize.define('shiftTable', {
-    name: DataTypes.STRING,
+   name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
     startTime: DataTypes.STRING,
     endTime: DataTypes.STRING
   }, {});
