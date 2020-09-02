@@ -24,6 +24,40 @@ exports.create = async (req, res ,next) => {
   };
 
   req.transactionType="Entry";
+
+  var checkMasterData = await RFIDTagMaster.findAll({
+    where:{
+      vinNumber: vinNumber
+    }
+  });
+
+  // console.log(checkMasterData);
+  if (checkMasterData[0]) {
+    return next(HTTPError(400, "VIN Number already exist in Database"));
+  }
+  // console.log(checkMasterData);
+
+  var checkMasterData = await RFIDTagMaster.findAll({
+    where:{
+      epcId: epcId
+    }
+  });
+
+  if (checkMasterData[0]) {
+    return next(HTTPError(400, "TAG Id already exist in Database"));
+  }
+
+  var checkMasterData = await RFIDTagMaster.findAll({
+    where:{
+      pinNumber: pinNumber
+    }
+  });
+
+  if (checkMasterData[0]) {
+    return next(HTTPError(400, "PIN Number already exist in Database"));
+  }
+  // console.log(checkMasterData);
+
   var masterData;
   try {
     masterData = await RFIDTagMaster.create(master)
