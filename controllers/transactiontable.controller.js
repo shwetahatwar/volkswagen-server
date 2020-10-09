@@ -12,7 +12,9 @@ exports.create = async(req,res,next) =>{
   var transaction = {
   	rfidMasterId: req.createdMasterData.id,
     timestamp: Date.now(),
-    transactionType:transactionType
+    transactionType:transactionType,
+    createdBy:req.user.name,
+    updatedBy:req.user.name
   }
 
   var transactionData = await TransactionTable.create(transaction);

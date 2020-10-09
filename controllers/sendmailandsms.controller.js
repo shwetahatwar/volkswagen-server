@@ -4,6 +4,7 @@ var ping = require('ping');
 const deviceTransactionFunction = require('../functions/createDeviceTransaction');
 var nodemailer = require ('nodemailer');
 // var text = require('textbelt');
+const UserDetails = require('../models').userDetails;
 
 var selfSignedConfig = {
   host: 'smtp.zoho.com',
@@ -66,9 +67,19 @@ result += "</table>";
 result += "<br/>";
 result +="Have a great day!";
 console.log("result",result);
+var mailReceiversList = "";
+var userDetailsList = await UserDetails.findAll({
+  where:{
+    isActive:true
+  }
+});
+for(var i=0;i<userDetailsList.length;i++){
+  mailReceiversList += userDetailsList[i]["dataValues"]["emailId"]
+}
 var mailOptions = {
   from: "servicedesk@briot.in", 
-  to: "sagar@briot.in;servicedesk@briot.in",
+  // to: "sagar@briot.in;servicedesk@briot.in",
+  to:mailReceiversList,
   subject: "Device Connection Alert", 
   html: ''+result+'',
 };

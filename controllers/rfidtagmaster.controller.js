@@ -4,12 +4,24 @@ const Op = Sequelize.Op;
 var HTTPError = require('http-errors');
 const WhereBuilder = require('../helpers/WhereBuilder');
 const createTransaction = require('../functions/createTransactionDetails');
+const TransactionTable = require('../models').transactionTable;
 
 // Create and Save a new rfid tag master
 exports.create = async (req, res ,next) => {
   var { vinNumber , pinNumber , epcId } = req.body;
   if (!vinNumber || !pinNumber || !epcId ) {
     return next(HTTPError(400, "Content cannot be empty!"))
+  }
+
+  const date = new Date();
+  let hours = date.getHours();
+  console.log("hours",hours);
+  var shift="C";
+  if(hours >= 6 && hours <=14.5){
+    shift="A"
+  }
+  else if(hours >= 14.5 && hours <=23){
+    shift="B"
   }
 
   var master = {
@@ -20,9 +32,14 @@ exports.create = async (req, res ,next) => {
     verifiedTimestamp:0,
     entryStation:"CP6",
     verifiedStation:"",
-    isActive:true
+    entryShift: shift,
+    verifiyingShift: "",
+    isActive: true,
+    hall: req.user.hall,
+    createdBy: req.user.name,
+    updatedBy: req.user.name
   };
-
+  console.log(shift)
   req.transactionType="Entry";
 
   var checkMasterData = await RFIDTagMaster.findAll({
@@ -88,6 +105,7 @@ exports.update = async (req, res,next) => {
   .clause('epcId', epcId)
   .clause('vinNumber', vinNumber)
   .clause('isActive', isActive)  
+  .clause('updatedBy', req.user.name)  
   .clause('pinNumber', pinNumber).toJSON();
   try{
     var updatedMasterData = await RFIDTagMaster.update(updateData, {
@@ -146,23 +164,35 @@ exports.findAll = async (req, res,next) => {
   .clause('vinNumber', vinNumber).toJSON();
 
   var masterData;
-  masterData = await RFIDTagMaster.findAll({
-    where:whereClause,
-    order: [
-    ['id', 'DESC'],
-    ],
-    offset:newOffset,
-    limit:newLimit
-  });
+  if(verifiedStation=="CP8"){
+    masterData = await RFIDTagMaster.findAll({
+      where:whereClause,
+      order: [
+      ['updatedAt', 'DESC'],
+      ],
+      offset:newOffset,
+      limit:newLimit
+    }); 
+  }
+  else{
+    masterData = await RFIDTagMaster.findAll({
+      where:whereClause,
+      order: [
+      ['id', 'DESC'],
+      ],
+      offset:newOffset,
+      limit:newLimit
+    }); 
+  }
 
   if (!masterData) {
     return next(HTTPError(400, "RFID tag master data not found"));
   }
 
-  if(masterData && masterData.length ==1){
+  if(masterData && masterData.length == 1){
     console.log("In verifiedStation");
     if(epcId && pinNumber && vinNumber){
-      var transactionData = await createTransaction.updateRFIDMMasterAndCreateTransaction(masterData[0])
+      var transactionData = await createTransaction.updateRFIDMMasterAndCreateTransaction(masterData[0],req.user.name)
     }
   }
 
@@ -199,7 +229,7 @@ exports.sendFindResponse = async (req, res, next) => {
 
 //search query
 exports.searchMasterDataByQuery = async (req, res,next) => {
-  var { createdAtStart , createdAtEnd , shift ,offset, limit , epcId , vinNumber , pinNumber } = req.query;
+  var { createdAtStart , createdAtEnd , hall ,shift ,offset, limit , epcId , vinNumber , pinNumber , entryStation , verifiedStation } = req.query;
 
   var newOffset = 0;
   var newLimit = 100;
@@ -212,17 +242,17 @@ exports.searchMasterDataByQuery = async (req, res,next) => {
     newLimit = parseInt(limit)
   }
 
-  if(req.shiftNameData){
-    console.log("shift details",req.shiftNameData);
-    var startTime = createdAtStart.toString() +" "+ req.shiftNameData["startTime"].toString();
-    var endTime = createdAtStart +" "+ req.shiftNameData["endTime"];
-    var dt = new Date(startTime);
-    console.log(startTime,dt)
-    createdAtStart = dt.setSeconds( dt.getSeconds());
-     dt = new Date(endTime);
-    createdAtEnd = dt.setSeconds( dt.getSeconds());
-    console.log(createdAtStart,createdAtEnd)
-  }
+  // if(req.shiftNameData){
+  //   console.log("shift details",req.shiftNameData);
+  //   var startTime = createdAtStart.toString() +" "+ req.shiftNameData["startTime"].toString();
+  //   var endTime = createdAtStart +" "+ req.shiftNameData["endTime"];
+  //   var dt = new Date(startTime);
+  //   console.log(startTime,dt)
+  //   createdAtStart = dt.setSeconds( dt.getSeconds());
+  //    dt = new Date(endTime);
+  //   createdAtEnd = dt.setSeconds( dt.getSeconds());
+  //   console.log(createdAtStart,createdAtEnd)
+  // }
 
   if(!epcId){
     epcId="";
@@ -235,9 +265,23 @@ exports.searchMasterDataByQuery = async (req, res,next) => {
   }
   var whereClause = {};
   if(createdAtStart && createdAtEnd){
-    whereClause.entryTimestamp = {
-      [Op.gte]: parseInt(createdAtStart),
-      [Op.lt]: parseInt(createdAtEnd),
+    if(verifiedStation=="CP8"){
+      if(shift){
+        whereClause.verifiyingShift = shift
+      }
+      whereClause.verifiedTimestamp = {
+        [Op.gte]: parseInt(createdAtStart),
+        [Op.lt]: parseInt(createdAtEnd),
+      }
+    }
+    else{
+      if(shift){
+        whereClause.entryShift = shift
+      }
+      whereClause.entryTimestamp = {
+        [Op.gte]: parseInt(createdAtStart),
+        [Op.lt]: parseInt(createdAtEnd),
+      }
     }
   }
 
@@ -257,17 +301,46 @@ exports.searchMasterDataByQuery = async (req, res,next) => {
       [Op.like]:'%'+pinNumber+'%'
     };
   }
+  if(verifiedStation){
+    whereClause.verifiedStation = {
+      [Op.like]:'%'+verifiedStation+'%'
+    }
+  }
+  if(entryStation){
+    whereClause.entryStation = {
+      [Op.like]:'%'+entryStation+'%'
+    }
+  }
+  if(hall){
+    whereClause.hall=hall
+  }
 
   whereClause.isActive = true;
 
-  var reportData = await RFIDTagMaster.findAll({ 
-    where: whereClause,
-    order: [
-    ['createdAt', 'DESC'],
-    ],
-    offset:newOffset,
-    limit:newLimit
-  });
+  var reportData;
+
+  if(verifiedStation=="CP8"){
+    reportData = await RFIDTagMaster.findAll({
+      where:whereClause,
+      order: [
+      ['updatedAt', 'DESC'],
+      ],
+      offset:newOffset,
+      limit:newLimit
+    }); 
+  }
+  else{
+    reportData = await RFIDTagMaster.findAll({
+      where:whereClause,
+      order: [
+      ['id', 'DESC'],
+      ],
+      offset:newOffset,
+      limit:newLimit
+    }); 
+  }
+
+
   if(!reportData){
     res.status(500).send({
       message: "Error while retrieving master data"
@@ -294,8 +367,19 @@ exports.searchMasterDataByQuery = async (req, res,next) => {
 
 // get count of all rfid master data 
 exports.countOfRfidMaster = async (req, res) => {
- var whereClause={};
- whereClause.isActive=true;
+  var whereClause={};
+  var {entryStation,verifiedStation}= req.query;
+  if(verifiedStation){
+    whereClause.verifiedStation = {
+      [Op.like]:'%'+verifiedStation+'%'
+    }
+  }
+  if(entryStation){
+    whereClause.entryStation = {
+      [Op.like]:'%'+entryStation+'%'
+    }
+  }
+  whereClause.isActive=true;
   var total = await RFIDTagMaster.count({
     where :whereClause
   })
@@ -308,4 +392,35 @@ exports.countOfRfidMaster = async (req, res) => {
     totalCount : total 
   }
   res.status(200).send(totalCount);
-}
+};
+
+//Delete rfid tag master by Pin number
+exports.delete = async (req, res,next) => {
+  var { epcId , vinNumber , pinNumber,isActive } = req.body;
+  if(req.masterDataList.length == 0){
+    return next(HTTPError(500, "Record is not deleted due to invalid pin number"))
+  }
+  const id = req.masterDataList[0]["id"];
+
+  var transactionTable = await TransactionTable.destroy({
+    where: { rfidMasterId: id }
+  })
+  if(!transactionTable){
+    return next(HTTPError(500,"Cannot delete Record with entered pin number"))
+  }
+  var rfIfMaster =await RFIDTagMaster.destroy({
+    where: { id: id }
+  })
+
+  if(!rfIfMaster){
+    return next(HTTPError(500,"Cannot delete Record with entered pin number"))
+  }
+
+  next();    
+};
+
+
+exports.sendDeleteResponse = async (req, res, next) => {
+  console.log("responseData")
+  res.status(200).send({message: "success"});
+};

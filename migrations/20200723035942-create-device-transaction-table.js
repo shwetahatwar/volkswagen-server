@@ -31,6 +31,14 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      createdBy:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
+      updatedBy:{
+        type:DataTypes.STRING,
+        allowNull:true
       }
     });
   },

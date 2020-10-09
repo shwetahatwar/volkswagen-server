@@ -4,13 +4,25 @@ const Op = Sequelize.Op;
 var HTTPError = require('http-errors');
 const TransactionTable = require('../models').transactionTable;
 
-exports.updateRFIDMMasterAndCreateTransaction = async(rfidData)=> {
+exports.updateRFIDMMasterAndCreateTransaction = async(rfidData,name)=> {
 	var updateData = {};
-	console.log("rfidData",rfidData)
+	console.log("rfidData",rfidData);
+
+	const date = new Date();
+	let hours = date.getHours();
+	var shift="C";
+	if(hours >=6 && hours <=14.5){
+		shift="A"
+	}
+	else if(hours >=14.5 && hours <=11){
+		shift="B"
+	}
 	var rfidMasterId = rfidData["id"];
 	updateData.verifiedTimestamp = Date.now();
 	updateData.verifiedStation = "CP8";
-
+	updateData.verifiyingShift = shift;
+	updateData.updatedBy = name;
+	
 	try{
 		var updatedMasterData = await RFIDTagMaster.update(updateData, {
 			where: {

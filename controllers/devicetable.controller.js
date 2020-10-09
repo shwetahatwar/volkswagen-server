@@ -18,7 +18,9 @@ exports.create = async(req,res,next) =>{
     deviceIp: deviceIp,
     station: station,
     connectionStatus: connectionStatus,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    createdBy:req.user.name,
+    updatedBy:req.user.name
   }
 
   var deviceData;

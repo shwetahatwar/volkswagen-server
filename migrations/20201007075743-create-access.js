@@ -1,23 +1,20 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('shiftTables', {
+    return queryInterface.createTable('accesses', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique:true
+      url: {
+        type: Sequelize.STRING
       },
-      startTime: {
-        type: Sequelize.STRING,
-        allowNull: false
+      httpMethod: {
+        type: Sequelize.STRING
       },
-      endTime: {
+      status: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -27,18 +24,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      createdBy:{
-        type:DataTypes.STRING,
-        allowNull:true
-      },
-      updatedBy:{
-        type:DataTypes.STRING,
-        allowNull:true
       }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('shiftTables');
+    return queryInterface.dropTable('accesses');
   }
 };

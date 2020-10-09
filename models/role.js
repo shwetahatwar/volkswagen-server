@@ -1,19 +1,12 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const deviceTable = sequelize.define('deviceTable', {
-    deviceId: {
+  const Role = sequelize.define('role', {
+    name: {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false
     },
-    deviceIp: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false
-    },
-    station: DataTypes.STRING,
-    connectionStatus: DataTypes.STRING,
-    timestamp: DataTypes.STRING,
+    isActive: DataTypes.BOOLEAN,
     createdBy:{
       type:DataTypes.STRING,
       allowNull:true
@@ -23,8 +16,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:true
     }
   }, {});
-  deviceTable.associate = function(models) {
+  Role.associate = function(models) {
     // associations can be defined here
   };
-  return deviceTable;
+  return Role;
 };

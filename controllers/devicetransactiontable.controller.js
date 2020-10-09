@@ -13,6 +13,8 @@ exports.create = async(req,res,next) =>{
   	deviceId : deviceId,
     station : station,
     connectionStatus : connectionStatus,
+    createdBy:req.user.name,
+    updatedBy:req.user.name,
     timestamp : Date.now()
   }
 

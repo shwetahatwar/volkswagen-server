@@ -1,27 +1,14 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('transactionTables', {
+    return queryInterface.createTable('roles', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      rfidMasterId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'rfidTagMasters',
-          key: 'id',
-          as: 'rfidtagmaster',
-        },
-      },
-      timestamp: {
-        type: Sequelize.STRING
-      },
-      transactionType: {
+      name: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -31,6 +18,9 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },      
+      isActive: {
+        type: Sequelize.BOOLEAN
       },
       createdBy:{
         type:DataTypes.STRING,
@@ -43,6 +33,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('transactionTables');
+    return queryInterface.dropTable('Roles');
   }
 };

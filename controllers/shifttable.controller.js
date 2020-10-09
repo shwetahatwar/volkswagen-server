@@ -15,7 +15,9 @@ exports.create = async(req,res,next) =>{
   var shift = {
   	startTime: startTime,
     endTime: endTime,
-    name: name
+    name: name,
+    createdBy:req.user.name,
+    updatedBy:req.user.name
   }
 
   var shiftData;
@@ -27,6 +29,7 @@ exports.create = async(req,res,next) =>{
     }
   }
   catch (err) {
+    console.log(err)
     if(err["errors"]){
       return next(HTTPError(500,err["errors"][0]["message"]))
     }
